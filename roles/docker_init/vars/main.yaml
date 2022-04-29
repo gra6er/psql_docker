@@ -1,0 +1,10 @@
+# DNF packages to prepare host  
+dnf_packages:
+  - dnf-utils
+  - python3-pip
+  - unzip
+  - docker-ce
+
+# PIP packages to prepare host
+pip_packages:
+  - docker-py

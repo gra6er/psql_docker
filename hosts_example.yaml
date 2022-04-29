@@ -1,0 +1,27 @@
+all:
+  hosts:
+    192.168.77.123:
+
+  vars:
+    ansible_user: <sudo user>
+    ansible_password: <sudo user's password>
+    ansible_become: yes
+    ansible_become_password: <sudo user's password>
+
+    deploy_docker: yes
+    run_start_scripts: yes
+
+    images:
+      postgres: postgres:13
+
+    container:
+      name: postgres_by_playbook
+
+    postgres:
+      port: <posrgres port>
+      database: <postgres database>
+      user: <postgres user>
+      password: <admin's user password>
+
+    # Deploy custom /etc/docker/daemon.json or not. If yes put it to files folder
+    daemon_json_deploy: yes

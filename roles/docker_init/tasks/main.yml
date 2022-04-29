@@ -1,0 +1,51 @@
+---
+# tasks file for docker_init
+
+# Change it to dnf module
+- name: Adding Docker repo
+  ansible.builtin.command: dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+    
+- name: Import a key from a url
+  ansible.builtin.rpm_key:
+    state: present
+    key: https://download.docker.com/linux/centos/gpg
+
+- name: Ensure dependencies are installed
+  ansible.builtin.dnf:
+    name: '{{ item }}'
+    state: present
+    update_cache: yes
+  loop: '{{ dnf_packages }}'
+
+- name: Install python packages
+  ansible.builtin.pip:
+    name: '{{ item }}'
+    state: present
+  loop: '{{ pip_packages }}'
+
+- name: Make sure a service unit is running
+  ansible.builtin.systemd:
+    state: started
+    enabled: yes
+    name: docker
+
+- name: Adding 'ansible_user' to docker group
+  ansible.builtin.user:
+    name: '{{ ansible_user }}'
+    groups: docker
+    append: yes
+
+
+- name: Copy daemon.json file
+  ansible.builtin.copy:
+    src: files/daemon.json
+    dest: /etc/docker/daemon.json
+    mode: 0644
+  when: daemon_json_deploy
+
+- name: Start the Docker daemon
+  ansible.builtin.systemd:
+    name: docker
+    state: restarted
+    daemon_reload: yes
+    masked: no

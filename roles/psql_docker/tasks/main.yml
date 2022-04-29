@@ -1,0 +1,41 @@
+---
+# tasks file for psql_test
+
+- name: Ensure config dirs are present
+  ansible.builtin.file: 
+    path: /opt/postgres/scripts
+    state: directory
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+    mode: 0755
+
+
+- name: Copy start sql script
+  ansible.builtin.copy:
+    src: files/
+    dest: /opt/postgres/scripts/
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+    mode: 0644
+  when: run_start_scripts
+
+
+- name: Run postgres
+  docker_container:
+    name: '{{ container.name }}'
+    image: '{{ images.postgres }}'
+    ports:
+      - '{{ postgres.port }}:5432'
+    restart_policy: always
+    env:
+      POSTGRES_USER: '{{ postgres.user }}'
+      POSTGRES_PASSWORD: '{{ postgres.password }}'
+      POSTGRES_DB: '{{ postgres.database }}'
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - /opt/postgres:/var/lib/postgresql/data
+      - /opt/postgres/scripts:/docker-entrypoint-initdb.d
+
+
+
+

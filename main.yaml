@@ -1,0 +1,9 @@
+---
+- name: Install postgresql docker container on host
+  hosts: all
+  gather_facts: no
+  roles:
+    - role: docker_init
+      when: deploy_docker
+      
+    - role: psql_docker
