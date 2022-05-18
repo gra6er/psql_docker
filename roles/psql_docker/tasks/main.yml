@@ -1,6 +1,7 @@
 ---
 # tasks file for psql_test
 
+#TODO rebuild init scripts mechanism 
 - name: Ensure config dirs are present
   ansible.builtin.file: 
     path: /opt/postgres/scripts
@@ -12,7 +13,7 @@
 
 - name: Copy start sql script
   ansible.builtin.copy:
-    src: files/
+    src: files/init_scripts
     dest: /opt/postgres/scripts/
     owner: '{{ ansible_user }}'
     group: '{{ ansible_user }}'
@@ -33,7 +34,8 @@
       POSTGRES_DB: '{{ postgres.database }}'
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-      - /opt/postgres:/var/lib/postgresql/data
+      - '{{container.name}}-vol:/var/lib/postgresql/data'
+      #TODO rebuild init scripts mechanism
       - /opt/postgres/scripts:/docker-entrypoint-initdb.d
 
 
